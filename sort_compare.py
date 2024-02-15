@@ -1,64 +1,71 @@
 import time
 import random
 
-def insertion_sort(arr):
-    for i in range(1, len(arr)):
-        key = arr[i]
-        j = i - 1
-        while j >= 0 and key < arr[j]:
-            arr[j + 1] = arr[j]
-            j -= 1
-        arr[j + 1] = key
-    return arr
+def insertion_sort(alist):
+    start_time = time.time()
+    for index in range(1, len(alist)):
+        current_value = alist[index]
+        position = index
 
-def shell_sort(arr):
-    n = len(arr)
-    gap = n // 2
-    while gap > 0:
-        for i in range(gap, n):
-            temp = arr[i]
-            j = i
-            while j >= gap and arr[j - gap] > temp:
-                arr[j] = arr[j - gap]
-                j -= gap
-            arr[j] = temp
-        gap //= 2
-    return arr
+        while position > 0 and alist[position - 1] > current_value:
+            alist[position] = alist[position - 1]
+            position = position - 1
 
-def python_sort(arr):
-    return sorted(arr)
+        alist[position] = current_value
+
+    end_time = time.time()
+    return alist, end_time - start_time
+
+def shell_sort(alist):
+    start_time = time.time()
+    sublist_count = len(alist) // 2
+
+    while sublist_count > 0:
+        for start_position in range(sublist_count):
+            gap_insertion_sort(alist, start_position, sublist_count)
+
+        sublist_count = sublist_count // 2
+
+    end_time = time.time()
+    return alist, end_time - start_time
+
+def gap_insertion_sort(alist, start, gap):
+    for i in range(start + gap, len(alist), gap):
+        current_value = alist[i]
+        position = i
+
+        while position >= gap and alist[position - gap] > current_value:
+            alist[position] = alist[position - gap]
+            position = position - gap
+
+        alist[position] = current_value
+
+def python_sort(alist):
+    start_time = time.time()
+    sorted_list = sorted(alist)
+    end_time = time.time()
+    return sorted_list, end_time - start_time
 
 def main():
-    sizes = [500, 1000, 10000]
-    for size in sizes:
-        avg_insertion_sort_time = 0
-        avg_shell_sort_time = 0
-        avg_python_sort_time = 0
-        for i in range(100):
-            arr = [random.randint(0, 1000) for _ in range(size)]
+    list_sizes = [500, 1000, 5000]
+    avg_times = {'Insertion Sort': 0, 'Shell Sort': 0, 'Python Sort': 0}
 
-            start_time = time.time()
-            insertion_sort(arr)
-            end_time = time.time()
-            avg_insertion_sort_time += end_time - start_time
+    for size in list_sizes:
+        for _ in range(100):
+            random_list = random.sample(range(1, 10000), size)
 
-            start_time = time.time()
-            shell_sort(arr)
-            end_time = time.time()
-            avg_shell_sort_time += end_time - start_time
+            _, insertion_time = insertion_sort(random_list.copy())
+            _, shell_time = shell_sort(random_list.copy())
+            _, python_sort_time = python_sort(random_list.copy())
 
-            start_time = time.time()
-            python_sort(arr)
-            end_time = time.time()
-            avg_python_sort_time += end_time - start_time
+            avg_times['Insertion Sort'] += insertion_time
+            avg_times['Shell Sort'] += shell_time
+            avg_times['Python Sort'] += python_sort_time
 
-        avg_insertion_sort_time /= 100
-        avg_shell_sort_time /= 100
-        avg_python_sort_time /= 100
-
-        print(f"Insertion Sort took {avg_insertion_sort_time:.2f} seconds to run, on average")
-        print(f"Shell Sort took {avg_shell_sort_time:.2f} seconds to run, on average")
-        print(f"Python Sort took {avg_python_sort_time:.2f} seconds to run, on average")
+    for algo, time_taken in avg_times.items():
+        avg_time = time_taken / 100
+        print(f"{algo} took {avg_time:10.7f} seconds to run, on average")
 
 if __name__ == "__main__":
     main()
+# Write your code here :-)
